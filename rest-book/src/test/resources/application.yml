@@ -1,0 +1,49 @@
+server:
+  servlet:
+    context-path: /v1
+spring:
+  datasource:
+    url: jdbc:h2:mem:./test_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    hibernate:
+      show_sql: true
+      format_sql: true
+      generate_statistics: true
+      use-new-id-generator-mappings: false
+  circuitbreaker:
+    resilience4j:
+      enabled: true
+  cloud:
+    circuitbreaker:
+      resilience4j:
+        enabled: true
+    discovery:
+      enabled: false
+    config:
+      enabled: false
+      fail-fast: off
+springdoc:
+  api-docs:
+    enabled: false
+
+
+booknumbers:
+  api:
+    url: http://127.0.0.1:9999/v1/isbns
+    timeout_sec: 2
+
+logging:
+  level:
+    org:
+      hibernate:
+        stat: debug
+        type: trace
+      zalando:
+        logbook: TRACE
+
+opentracing:
+  jaeger:
+    enabled: false

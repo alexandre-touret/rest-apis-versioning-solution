@@ -1,0 +1,66 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /v1
+
+
+resilience4j.bulkhead:
+  configs:
+    default:
+      maxConcurrentCalls: 100
+  instances:
+    book-numbers:
+      maxConcurrentCalls: 10
+
+resilience4j.thread-pool-bulkhead:
+  configs:
+    default:
+      maxThreadPoolSize: 4
+      coreThreadPoolSize: 2
+      queueCapacity: 2
+  instances:
+    book-numbers:
+      baseConfig: default
+
+resilience4j.timelimiter:
+  configs:
+    default:
+      cancelRunningFuture: true
+      timeoutDuration: 2s
+  instances:
+    book-numbers:
+      baseConfig: default
+time.to.sleep: 100
+
+
+management:
+  auditevents:
+    enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      enabled: true
+      probes:
+        enabled: true
+      show-details: always
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+spring:
+  cloud:
+    discovery:
+      enabled: false
+    config:
+      enabled: false
+      fail-fast: off
+
+opentracing:
+  jaeger:
+    enabled: false

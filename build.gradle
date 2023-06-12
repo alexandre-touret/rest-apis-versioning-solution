@@ -1,0 +1,193 @@
+plugins {
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+    id 'java'
+    id 'idea'
+    id 'org.openapi.generator' version "${openApiGeneratorVersion}"
+}
+
+bootJar {
+    enabled = false
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    group = 'info.touret.bookstore.spring'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = '17'
+
+    repositories {
+        maven { url 'https://repo.spring.io/milestone' }
+        mavenCentral()
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+}
+
+subprojects {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    dependencies {
+        developmentOnly 'org.springframework.boot:spring-boot-devtools'
+        //implementation 'io.opentracing.contrib:opentracing-spring-jaeger-cloud-starter:3.3.1'
+        implementation 'io.micrometer:micrometer-registry-prometheus'
+        implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+        implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+        implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
+        implementation 'org.springframework.boot:spring-boot-starter-aop'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
+    }
+
+    bootJar {
+        enabled = true
+    }
+}
+project(':rest-book') {
+    apply plugin: 'org.openapi.generator'
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        runtimeOnly 'org.postgresql:postgresql'
+        testImplementation 'com.h2database:h2'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+        implementation 'org.springframework.cloud:spring-cloud-starter-config'
+        implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+        implementation 'com.fasterxml.jackson.core:jackson-annotations'
+        implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+        implementation 'org.zalando:logbook-spring-boot-starter:3.0.0'
+        annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    }
+    openApiValidate {
+        inputSpec = "$projectDir/src/main/resources/openapi.yml".toString()
+        recommend = true
+    }
+    openApiGenerate {
+        generatorName = "spring"
+        library = "spring-boot"
+        modelNameSuffix = "Dto"
+        inputSpec = "$projectDir/src/main/resources/openapi.yml".toString()
+        outputDir = "$buildDir/generated".toString()
+        apiPackage = "info.touret.bookstore.spring.book.generated.controller"
+        invokerPackage = "info.touret.bookstore.spring.book.generated.invoker"
+        modelPackage = "info.touret.bookstore.spring.book.generated.dto"
+        configOptions = [
+                dateLibrary          : "java8",
+                java8                : "true",
+                openApiNullable      : "false",
+                documentationProvider: "springdoc",
+                useBeanValidation    : "true",
+                interfaceOnly        : "true",
+                useSpringBoot3       : "true"
+        ]
+    }
+    tasks.withType(JavaCompile) {
+        options.compilerArgs = [
+                '-Amapstruct.suppressGeneratorTimestamp=true',
+                '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+                '-Amapstruct.defaultComponentModel=spring'
+        ]
+    }
+
+    springBoot {
+        mainClass = "info.touret.bookstore.spring.RestBookstoreApplication"
+    }
+    sourceSets.main.java.srcDirs += "$buildDir/generated/src/main/java".toString()
+    compileJava.dependsOn 'openApiGenerate'
+}
+
+project(':rest-number') {
+    apply plugin: 'org.openapi.generator'
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+        implementation 'org.springframework.cloud:spring-cloud-starter-config'
+        implementation 'org.springframework.boot:spring-boot-starter-aop'
+        implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+        implementation 'com.fasterxml.jackson.core:jackson-annotations'
+        implementation "com.github.javafaker:javafaker:${javaFakerVersion}"
+        implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
+        implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+        annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+    }
+
+    openApiValidate {
+        inputSpec = "$projectDir/src/main/resources/openapi.yml".toString()
+        recommend = true
+    }
+    openApiGenerate {
+        generatorName = "spring"
+        library = "spring-boot"
+        modelNameSuffix = "Dto"
+        inputSpec = "$projectDir/src/main/resources/openapi.yml".toString()
+        outputDir = "$buildDir/generated".toString()
+        apiPackage = "info.touret.bookstore.spring.number.generated.controller"
+        invokerPackage = "info.touret.bookstore.spring.number.generated.invoker"
+        modelPackage = "info.touret.bookstore.spring.number.generated.dto"
+        configOptions = [
+                dateLibrary          : "java8",
+                java8                : "true",
+                openApiNullable      : "false",
+                documentationProvider: "springdoc",
+                useBeanValidation    : "true",
+                interfaceOnly        : "true",
+                useSpringBoot3       : "true"
+        ]
+    }
+    tasks.withType(JavaCompile) {
+        options.compilerArgs = [
+                '-Amapstruct.suppressGeneratorTimestamp=true',
+                '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+                '-Amapstruct.defaultComponentModel=spring'
+        ]
+    }
+    springBoot {
+        mainClass = "info.touret.bookstore.spring.number.RestNumbersApplication"
+    }
+    sourceSets.main.java.srcDirs += "$buildDir/generated/src/main/java".toString()
+    compileJava.dependsOn 'openApiGenerate'
+}
+
+project(':gateway') {
+    dependencies {
+        implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    }
+
+}
+
+project(':config-server') {
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.cloud:spring-cloud-config-server'
+    }
+
+}
+
+project(':authorization-server') {
+    dependencies {
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation "org.springframework.security:spring-security-oauth2-authorization-server"
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.security:spring-security-test'
+    }
+}

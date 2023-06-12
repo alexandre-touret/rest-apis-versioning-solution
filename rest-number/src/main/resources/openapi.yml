@@ -1,0 +1,56 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8081
+    description: Generated server url
+paths:
+  /isbns:
+    get:
+      tags:
+        - book-numbers-controller
+      summary: Gets book numbers
+      operationId: generateBookNumbers
+      responses:
+        '200':
+          description: Found the book numbers
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/BookNumbers"
+        '504':
+          description: Timeout error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+components:
+  schemas:
+    APIError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        reason:
+          type: string
+    BookNumbers:
+      type: object
+      properties:
+        asin:
+          type: string
+        isbn_10:
+          type: string
+        isbn_13:
+          type: string
+        ean_8:
+          type: string
+        ean_13:
+          type: string

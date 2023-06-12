@@ -1,0 +1,393 @@
+openapi: 3.0.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8082
+tags:
+  - name: maintenance-controller
+    description: Endpoint which enables maintenance
+  - name: book-controller
+    description: Endpoints related to books
+
+paths:
+  /maintenance:
+    get:
+      tags:
+        - maintenance-controller
+      operationId: retreiveInMaintenance
+      responses:
+        '200':
+          description: Checks if the application in under maitenance
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Maintenance"
+        '408':
+          description: Request Timeout
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+    put:
+      tags:
+        - maintenance-controller
+      operationId: initInMaintenance
+      requestBody:
+        content:
+          "*/*":
+            schema:
+              type: string
+        required: true
+      responses:
+        '204':
+          description: Put the app under maitenance
+        '408':
+          description: Request Timeout
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+  /books:
+    get:
+      tags:
+        - book-controller
+      summary: Gets all books
+      operationId: getAllBooks
+      responses:
+        '200':
+          description: Found books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Book"
+
+        '204':
+          description: No books found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Book"
+        '408':
+          description: Request Timeout
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+    put:
+      tags:
+        - book-controller
+      summary: Updates a book
+      operationId: updateBook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Book"
+        required: true
+      responses:
+        '202':
+          description: Books found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Book"
+        '408':
+          description: Request Timeout
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+    post:
+      tags:
+        - book-controller
+      summary: Creates a book
+      operationId: createBook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Book"
+        required: true
+      responses:
+        '201':
+          description: Book created. The URI is filled in the Location header
+          headers:
+            location:
+              description: The generated book's URI
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: string
+                format: uri
+        '202':
+          description: The book has not been yet created but will be ASAP
+          content:
+            application/json:
+              schema:
+                type: string
+                format: uri
+        '408':
+          description: The number api is unreachable
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: An unexpected error has occured
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+  /books/{id}:
+    get:
+      tags:
+        - book-controller
+      summary: Gets a book from its ID
+      operationId: getBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Found book
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Book"
+        '408':
+          description: Request Timeout
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+    delete:
+      tags:
+        - book-controller
+      summary: Removes a book
+      operationId: deleteBook
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Book removed
+        '408':
+          description: Request Timeout
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+  /books/random:
+    get:
+      tags:
+        - book-controller
+      summary: Gets a random book
+      operationId: getRandomBook
+      responses:
+        '200':
+          description: Found the book
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Book"
+        '408':
+          description: Request Timeout
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+  /books/count:
+    get:
+      tags:
+        - book-controller
+      summary: Gets the number of books
+      operationId: count
+      responses:
+        '200':
+          description: Number of books
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  format: int64
+        '408':
+          description: Request Timeout
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '418':
+          description: I'm a teapot
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+        '500':
+          description: Internal Server Error
+          content:
+            "*/*":
+              schema:
+                "$ref": "#/components/schemas/APIError"
+components:
+  schemas:
+    APIError:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        reason:
+          type: string
+    Book:
+      required:
+        - title
+      type: object
+      properties:
+        title:
+          type: string
+        isbn13:
+          type: string
+        isbn10:
+          type: string
+        author:
+          type: string
+        yearOfPublication:
+          type: integer
+          format: int32
+        nbOfPages:
+          type: integer
+          format: int32
+        rank:
+          maximum: 10
+          minimum: 1
+          type: integer
+          format: int32
+        price:
+          type: number
+        smallImageUrl:
+          type: string
+          format: url
+        mediumImageUrl:
+          type: string
+          format: url
+        description:
+          type: string
+        id:
+          type: integer
+          format: int64
+    Maintenance:
+      type: object
+      properties:
+        from:
+          type: string
+          format: date-time
+        inMaintenance:
+          type: boolean

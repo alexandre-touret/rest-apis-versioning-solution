@@ -1,0 +1,91 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /v1
+
+spring:
+  application:
+    name: rest-number
+  cloud:
+    circuitbreaker:
+      resilience4j:
+        enabled: true
+  zipkin:
+    base-url: http://localhost:9411
+    sender:
+      type: web
+
+resilience4j.bulkhead:
+  configs:
+    default:
+      maxConcurrentCalls: 100
+  instances:
+    book-numbers:
+      maxConcurrentCalls: 10
+
+resilience4j.thread-pool-bulkhead:
+  configs:
+    default:
+      maxThreadPoolSize: 4
+      coreThreadPoolSize: 2
+      queueCapacity: 2
+  instances:
+    book-numbers:
+      baseConfig: default
+
+resilience4j.timelimiter:
+  configs:
+    default:
+      cancelRunningFuture: false
+      timeoutDuration: 2s
+  instances:
+    book-numbers:
+      baseConfig: default
+time.to.sleep: 1000
+
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: '*'
+    jmx:
+      exposure:
+        include: '*'
+  auditevents:
+    enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      enabled: true
+      probes:
+        enabled: true
+      show-details: always
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+
+logging:
+  level:
+    org:
+      springframework:
+        web: info
+
