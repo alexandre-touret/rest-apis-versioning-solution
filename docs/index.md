@@ -51,7 +51,7 @@ books-zipkin        "start-zipkin"           zipkin              running (health
 
 Start a new shell and run the following command at the root of the project (i.e., ``rest-apis-versioning-workshop``)
 
-```
+```jshelllanguage
 ./gradlew bootRun -p config-server
 ```
 

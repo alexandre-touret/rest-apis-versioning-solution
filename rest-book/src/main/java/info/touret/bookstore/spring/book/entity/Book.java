@@ -45,6 +45,21 @@ public class Book implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @Transient
+    private transient String excerpt;
+
+    public String getExcerpt() {
+        return excerpt;
+    }
+
+    @PostLoad
+    public void initFields(){
+        if(description!=null) {
+            this.excerpt = description.substring(0, 100);
+        }
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

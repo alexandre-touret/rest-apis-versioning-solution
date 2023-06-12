@@ -43,14 +43,12 @@ You can now reach the current API documentation by running these commands:
 For the books API:
 
 ```jshelllanguage
-http:
-8082 / v1 / v3 / api - docs
+http :8082/v1/v3/api-docs
 ```
 For the numbers API:
 
 ```jshelllanguage
-http:
-8081 / v1 / v3 / api - docs
+http :8081/v1/v3/api-docs
 ```
 
 You can also check the documentation by browsing these endpoints:
@@ -75,7 +73,7 @@ You can get a random book by running this command:
 . ./bin/createBook.sh
 ```
 
-Now you can stop this service (i.e., [rest-book](../rest-book)) now by typin CTRL+C on the shell you started the rest-book module.
+Now you can stop this service (i.e., [rest-book](../rest-book)) now by typing CTRL+C on the shell you started the rest-book module.
 
 ## Adding new data
 
@@ -84,7 +82,7 @@ In this chapter, we will update the [Book schema in the OpenAPI spec file](../re
 This attribute is (only for the workshop) the beginning of the [description attribute](../rest-book/src/main/resources/openapi.yml).
 We will extract the first 100 characters.
 
-1. Update the [OpenAPI spec file]((../rest-book/src/main/resources/openapi.yml)), add the ``excerpt`` attribute
+1. Update the [OpenAPI spec file](../rest-book/src/main/resources/openapi.yml), add the ``excerpt`` attribute
 
 ```yaml
     Book:
@@ -175,7 +173,7 @@ For instance:
 
 You can also add a similar test in the [BookControllerIT](../rest-book/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java) integration test.
 
-For instance, you can add this assertion in the [``should_get_a_random_book``](../rest-book/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java):
+For instance, you can add this assertion in the [``should_get_a_random_book`` method](../rest-book/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java):
 
 ```java
 @Test
@@ -204,15 +202,13 @@ Restart your rest-book service
 Check it manually by running the following command:
 
 ```jshelllanguage
-http:
-8082 / v1 / books / 1098--print b|jq.excerpt 
+http :8082/v1/books/1098 --print b|jq.excerpt 
 ```
 
 You can also do that through the API Gateway:
 
 ```jshelllanguage
-http:
-8080 / v1 / books / 1098--print b|jq.excerpt 
+http :8080/v1/books/1098 --print b|jq.excerpt 
 ```
 ## Adding a new operation
 
@@ -330,27 +326,28 @@ Run it, check the log output provided by [LogBook](https://github.com/zalando/lo
 ```jshelllanguage
 ./gradlew -p rest-book test --tests "Old*IT"
 ```
+Check the [test log file](../rest-book/build/test-results/test/TEST-info.touret.bookstore.spring.book.controller.OldBookControllerIT.xml) and search the HTTP logs
 
-*Example*
+For instance:
 
 <details>
 <summary>Click to expand</summary>
 2023-06-09T17:19:49.723+02:00 TRACE 420048 --- [-auto-1-exec-10] org.zalando.logbook.Logbook              : {
   "origin" : "local",
   "type" : "response",
-  "correlation" : "83a5918100111142",
-  "duration" : 21,
+  "correlation" : "acc9e76fa90e42ed",
+  "duration" : 36,
   "protocol" : "HTTP/1.1",
   "status" : 200,
   "headers" : {
     "Connection" : [ "keep-alive" ],
     "Content-Type" : [ "application/json" ],
-    "Date" : [ "Fri, 09 Jun 2023 15:19:49 GMT" ],
+    "Date" : [ "Mon, 12 Jun 2023 15:54:16 GMT" ],
     "Keep-Alive" : [ "timeout=60" ],
     "Transfer-Encoding" : [ "chunked" ]
   },
   "body" : {
-  "excerpt":"Lorem ipsum dolor sit amet, consetetur sadipscing elitr",
+  "excerpt" : "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l",
   "title" : "la case de l oncle tom",
   "isbn13" : "1234567899123",
   "isbn10" : "1234567890",

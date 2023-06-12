@@ -351,6 +351,9 @@ components:
         - title
       type: object
       properties:
+        excerpt:
+          readOnly: true
+          type: string
         title:
           type: string
         isbn13:
