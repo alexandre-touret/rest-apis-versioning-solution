@@ -107,6 +107,7 @@ class BookControllerIT {
     void should_get_a_random_book() {
         var bookDto = testRestTemplate.getForEntity(booksUrl + "/random", BookDto.class).getBody();
         assertNotNull(bookDto.getId());
+        assertEquals(bookDto.getDescription().substring(0,100),bookDto.getExcerpt());
     }
 
 
@@ -185,4 +186,6 @@ class BookControllerIT {
         var responseEntity = testRestTemplate.getForEntity(booksUrl + "/100", BookDto.class);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
+
+
 }
