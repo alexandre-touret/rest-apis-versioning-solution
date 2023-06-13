@@ -287,7 +287,39 @@ script can be modified.
 
 Now you can test your API using either these two ways.
 
-### Create an ``accept`` media type header based version
+### Create a default version
+Now let's deep dive into the gateway configuration. 
+We will configure it to apply automatically a version if no one is applied.
+
+Stop the gateway by typing CTRL+C.
+
+Add the following route to **THE END** of the routes definition:
+
+
+```yaml
+  - id: default_version_v1
+    uri: http://127.0.0.1:8081
+    predicates:
+    - Path=/isbns
+    filters:
+    - RewritePath=/isbns,/v1/isbns
+```
+
+Restart the gateway
+
+```jshelllanguage
+ ./gradlew bootRun -p gateway
+```
+
+and run the following command:
+
+```jshelllanguage
+http :8080/isbns
+```
+
+The default version is automatically applied.
+
+### Create an ``accept`` media type header based version (OPTIONAL)
 
 It is also possible to specify the version in the [``accept`` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept).
 For example, you can define the new one defined in the last two paragraphs as following:
