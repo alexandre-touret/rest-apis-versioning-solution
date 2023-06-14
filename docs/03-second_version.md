@@ -43,10 +43,10 @@ project(':rest-book-2') {
         implementation 'org.springframework.boot:spring-boot-starter-validation'
         implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
         implementation 'org.springframework.cloud:spring-cloud-starter-config'
-        implementation 'io.github.resilience4j:resilience4j-spring-boot2'
         implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
         implementation 'com.fasterxml.jackson.core:jackson-annotations'
         implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+        implementation 'org.zalando:logbook-spring-boot-starter:3.0.0'
         annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     }
     openApiValidate {
@@ -64,7 +64,7 @@ project(':rest-book-2') {
         modelPackage = "info.touret.bookstore.spring.book.generated.dto"
         configOptions = [
                 dateLibrary          : "java8",
-                java8                : "true"
+                java8                : "true",
                 openApiNullable      : "false",
                 documentationProvider: "springdoc",
                 useBeanValidation    : "true",
@@ -132,7 +132,7 @@ You MAY also update your CI by adding a new job on [your Github workflow](../.gi
 ## Adding a new functionality
 
 In this new service, we are to deploy new features for our new customer. He/She has a huge library of books, we therefore want to
-limit the numbers of results provided by our [``/books`` API](../rest-book/src/main/java/info/touret/bookstore/spring/book/controller/BookController.java) to only 10 results.
+limit the numbers of results provided by our [``/books`` API](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/controller/BookController.java) to only 10 results.
 
 We could imagine that a search engine functionality would be more realistic.
 However, for this workshop, we will only work to a books list limiter.
@@ -145,6 +145,13 @@ In the [``BookRepository`` class](../rest-book-2/src/main/java/info/touret/books
 
 ```java
 List<Book> findAll(Pageable pageable);
+```
+
+Beware of the import of the ``Pageable`` class. 
+It should be:
+
+```java
+import org.springframework.data.domain.Pageable;
 ```
 
 In the [BookService](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/service/BookService.java) class, update the [``findAllBooks`` method](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/service/BookService.java):
@@ -206,7 +213,7 @@ void should_find_all_books() {
 ```
 
 The integration tests [BookControllerIT](../rest-book-2/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java) and [OldBookControllerIT](../rest-book-2/src/test/java/info/touret/bookstore/spring/book/controller/OldBookControllerIT.java) are not really representative of the new behaviour anymore because they only return one element.
-If you have time, you MAY update the [``books-data.sql``](../rest-book-2/src/test/resources/books-data.sql) file to have more elements and test the limit.
+If you have time enough, you MAY update the [``books-data.sql``](../rest-book-2/src/test/resources/books-data.sql) file to have more elements and test the limit.
 
 Finally, add the same config value you added earlier in [your test configuration file](../rest-book-2/src/test/resources/application.yml)
 

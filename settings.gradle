@@ -1,5 +1,6 @@
 rootProject.name = 'rest-apis-versioning-workshop'
 include 'rest-book'
+include 'rest-book-2'
 include 'rest-number'
 include 'gateway'
 include 'config-server'
