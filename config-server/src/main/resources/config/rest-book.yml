@@ -84,3 +84,6 @@ logging:
         type: info
       springframework:
         web: info
+book:
+  find:
+    limit: 10

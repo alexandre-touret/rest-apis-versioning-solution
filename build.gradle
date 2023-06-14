@@ -109,6 +109,60 @@ project(':rest-book') {
     compileJava.dependsOn 'openApiGenerate'
 }
 
+project(':rest-book-2') {
+    apply plugin: 'org.openapi.generator'
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        runtimeOnly 'org.postgresql:postgresql'
+        testImplementation 'com.h2database:h2'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+        implementation 'org.springframework.cloud:spring-cloud-starter-config'
+        implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springdocVersion}"
+        implementation 'com.fasterxml.jackson.core:jackson-annotations'
+        implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+        implementation 'org.zalando:logbook-spring-boot-starter:3.0.0'
+        annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    }
+    openApiValidate {
+        inputSpec = "$projectDir/src/main/resources/openapi.yml".toString()
+        recommend = true
+    }
+    openApiGenerate {
+        generatorName = "spring"
+        library = "spring-boot"
+        modelNameSuffix = "Dto"
+        inputSpec = "$projectDir/src/main/resources/openapi.yml".toString()
+        outputDir = "$buildDir/generated".toString()
+        apiPackage = "info.touret.bookstore.spring.book.generated.controller"
+        invokerPackage = "info.touret.bookstore.spring.book.generated.invoker"
+        modelPackage = "info.touret.bookstore.spring.book.generated.dto"
+        configOptions = [
+                dateLibrary          : "java8",
+                java8                : "true",
+                openApiNullable      : "false",
+                documentationProvider: "springdoc",
+                useBeanValidation    : "true",
+                interfaceOnly        : "true",
+                useSpringBoot3       : "true"
+        ]
+    }
+    tasks.withType(JavaCompile) {
+        options.compilerArgs = [
+                '-Amapstruct.suppressGeneratorTimestamp=true',
+                '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+                '-Amapstruct.defaultComponentModel=spring'
+        ]
+    }
+
+    springBoot {
+        mainClass = "info.touret.bookstore.spring.RestBookstoreApplication"
+    }
+    sourceSets.main.java.srcDirs += "$buildDir/generated/src/main/java".toString()
+    compileJava.dependsOn 'openApiGenerate'
+}
+
 project(':rest-number') {
     apply plugin: 'org.openapi.generator'
     dependencies {
