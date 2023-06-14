@@ -274,8 +274,7 @@ You can now test your API using this new way:
 http :8080/books/count "X-API-VERSION: v1" 
 ```
 
-You can use now some dedicated scripts for this new approach. For instance, the [``randomBook``](../bin/randomBook.sh)
-script can be modified.
+You can use now some dedicated scripts for this new approach:
 
 * ``bin/countBooks-header.sh``
 * ``bin/createBook-header.sh``
@@ -293,7 +292,7 @@ We will configure it to apply automatically a version if no one is applied.
 
 Stop the gateway by typing CTRL+C.
 
-Add the following route to **THE END** of the routes definition:
+Add the following route at **THE END** of the routes definition:
 
 
 ```yaml
@@ -317,9 +316,9 @@ and run the following command:
 http :8080/isbns
 ```
 
-The default version is automatically applied.
+The default version is automatically applied and the gateway should throw the request to the isbns v1 API endpoint.
 
-### Create an ``accept`` media type header based version (OPTIONAL)
+### Create an ``accept`` media type header based version (OPTIONAL-DEPRECATED)
 
 It is also possible to specify the version in the [``accept`` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept).
 For example, you can define the new one defined in the last two paragraphs as following:
