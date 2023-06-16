@@ -57,6 +57,73 @@ spring:
             - Path=/isbns
           filters:
             - RewritePath=/isbns,/v1/isbns
+              #V2
+              # HTTP HEADER VERSIONING
+        - id: rewrite_v2
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/books/{segment}
+            - Header=X-API-VERSION, v2
+          filters:
+            - RewritePath=/books/(?<segment>.*),/v2/books/$\{segment}
+        - id: rewrite_v2
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/books
+            - Header=X-API-VERSION, v2
+          filters:
+            - RewritePath=/books,/v2/books
+        - id: rewrite_v2
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/isbns
+            - Header=X-API-VERSION, v2
+          filters:
+            - RewritePath=/isbns,/v1/isbns
+        # HTTP ACCEPT MEDIA TYPE HEADER VERSIONING
+        - id: rewrite_accept_v2
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/books
+            - Header=accept, application/vnd.api\.v2\+json
+          filters:
+            - RewritePath=/books,/v2/books
+        - id: rewrite_accept_v2
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/books/{segment}
+            - Header=accept, application/vnd.api\.v2\+json
+          filters:
+            - RewritePath=/books/(?<segment>.*),/v2/books/$\{segment}
+        - id: rewrite_accept_v2
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/isbns
+            - Header=accept, application/vnd.api\.v2\+json
+          filters:
+            - RewritePath=/isbns,/v1/isbns
+        # URI PATH VERSIONING
+        - id: path_route
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/v2/books
+        - id: path_route
+          uri: http://127.0.0.1:8083
+          predicates:
+            - Path=/v2/books/{segment}
+        - id: path_route
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/v2/isbns
+          filters:
+            - RewritePath=/v2/isbns,/v1/isbns
+
+        - id: path_route
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/v2/isbns
+          filters:
+            - RewritePath=/v2/isbns,/v1/isbns
 
 
 # SECURITY CONFIGURATION TO BE APPLIED (remove comments to apply it)

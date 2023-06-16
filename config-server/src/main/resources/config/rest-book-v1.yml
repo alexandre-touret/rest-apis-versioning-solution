@@ -73,7 +73,7 @@ springdoc:
 booknumbers:
   api:
     url: http://127.0.0.1:8081/v1/isbns
-    timeout_sec: 2
+    timeout_sec: 5
 
 # Default values
 logging:
@@ -84,6 +84,3 @@ logging:
         type: info
       springframework:
         web: info
-book:
-  find:
-    limit: 10

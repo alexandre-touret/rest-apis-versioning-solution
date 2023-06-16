@@ -37,7 +37,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @DirtiesContext(classMode = BEFORE_CLASS)
 class OldBookControllerIT {
 
-    public static final String BOOKS_API_PREFIX = "/v1/books";
+    public static final String BOOKS_API_PREFIX = "/v2/books";
     @Value("${booknumbers.api.url}")
     public String isbnAPIURL;
     @LocalServerPort

@@ -41,13 +41,20 @@ You can test it using these HTTP requests:
 
 ```jshelllanguage
 http :8888/rest-book/v1 --print b | jq ' .propertySources[0].source' | jq '."server.servlet.context-path"'
+```
+You must have this output:
+
+```jshelllanguage
     "/v1"
 ```
-
 and
 
 ```jshelllanguage
 http :8888/rest-book/v2 --print b | jq ' .propertySources[0].source."server.servlet.context-path"'
+```
+You must have this output:
+
+```jshelllanguage
     "/v2"
 ```
 
@@ -68,6 +75,18 @@ spring.profiles.active=v2
 ```
 
 ### OpenAPI
+
+Modify [the rest-book v1 OpenAPI description file](../rest-book/src/main/resources/openapi.yml) to specify the new version:
+
+```yaml
+openapi: 3.0.0
+info:
+  title: OpenAPI definition
+  version: "v1"
+servers:
+  - url: http://localhost:8082/v1
+```
+
 Modify [the rest-book v2 OpenAPI description file](../rest-book-2/src/main/resources/openapi.yml) to specify the new version:
 
 ```yaml
@@ -89,7 +108,7 @@ For instance, in the [MaintenanceControllerIT class](../rest-book-2/src/test/jav
 
 ```java
 maintenanceUrl = "http://127.0.0.1:" + port + "/v2/maintenance";
-        booksUrl = "http://127.0.0.1:" + port + "/v2/books";
+booksUrl = "http://127.0.0.1:" + port + "/v2/books";
 ```
 
 You also have to update the [application.yml file](../rest-book-2/src/test/resources/application.yml):
@@ -140,7 +159,7 @@ In the fourth shell:
 ```
 </details>
 
-Now, reach your APIs:
+Now, reach your APIs (without using the gateway):
 
 For the V1:
 ```jshelllanguage
@@ -187,66 +206,67 @@ In the [gateway configuration file](../gateway/src/main/resources/application.ym
 <summary>Click to expand</summary>
 
 ```yaml
-        #V2
-        # HTTP HEADER VERSIONING
-        - id: rewrite_v2
-          uri: http://127.0.0.1:8083
-          predicates:
-            - Path=/books/{segment}
-            - Header=X-API-VERSION, v2
-          filters:
-            - RewritePath=/books/(?<segment>.*),/v2/books/$\{segment}
-        - id: rewrite_v2
-          uri: http://127.0.0.1:8083
-          predicates:
-            - Path=/books
-            - Header=X-API-VERSION, v2
-          filters:
-            - RewritePath=/books,/v2/books
-        - id: rewrite_v2
-          uri: http://127.0.0.1:8081
-          predicates:
-            - Path=/isbns
-            - Header=X-API-VERSION, v2
-          filters:
-            - RewritePath=/isbns,/v1/isbns
-        # HTTP ACCEPT MEDIA TYPE HEADER VERSIONING
-        - id: rewrite_accept_v2
-          uri: http://127.0.0.1:8083
-          predicates:
-            - Path=/books
-            - Header=accept, application/vnd.api\.v2\+json
-          filters:
-            - RewritePath=/books,/v2/books
-        - id: rewrite_accept_v2
-          uri: http://127.0.0.1:8083
-          predicates:
-            - Path=/books/{segment}
-            - Header=accept, application/vnd.api\.v2\+json
-          filters:
-            - RewritePath=/books/(?<segment>.*),/v2/books/$\{segment}
-        - id: rewrite_accept_v2
-          uri: http://127.0.0.1:8081
-          predicates:
-            - Path=/isbns
-            - Header=accept, application/vnd.api\.v2\+json
-          filters:
-            - RewritePath=/isbns,/v1/isbns
-        # URI PATH VERSIONING
-        - id: path_route
-          uri: http://127.0.0.1:8083
-          predicates:
-            - Path=/v2/books
-        - id: path_route
-          uri: http://127.0.0.1:8083
-          predicates:
-            - Path=/v2/books/{segment}
-        - id: path_route
-          uri: http://127.0.0.1:8081
-          predicates:
-            - Path=/v2/isbns
-          filters:
-            - RewritePath=/v2/isbns,/v1/isbns
+                   #V2
+                   # HTTP HEADER VERSIONING
+                   - id: rewrite_v2
+                     uri: http://127.0.0.1:8083
+                     predicates:
+                       - Path=/books/{segment}
+                       - Header=X-API-VERSION, v2
+                     filters:
+                       - RewritePath=/books/(?<segment>.*),/v2/books/$\{segment}
+                   - id: rewrite_v2
+                     uri: http://127.0.0.1:8083
+                     predicates:
+                       - Path=/books
+                       - Header=X-API-VERSION, v2
+                     filters:
+                       - RewritePath=/books,/v2/books
+                   - id: rewrite_v2
+                     uri: http://127.0.0.1:8081
+                     predicates:
+                       - Path=/isbns
+                       - Header=X-API-VERSION, v2
+                     filters:
+                       - RewritePath=/isbns,/v1/isbns
+                   # HTTP ACCEPT MEDIA TYPE HEADER VERSIONING
+                   - id: rewrite_accept_v2
+                     uri: http://127.0.0.1:8083
+                     predicates:
+                       - Path=/books
+                       - Header=accept, application/vnd.api\.v2\+json
+                     filters:
+                       - RewritePath=/books,/v2/books
+                   - id: rewrite_accept_v2
+                     uri: http://127.0.0.1:8083
+                     predicates:
+                       - Path=/books/{segment}
+                       - Header=accept, application/vnd.api\.v2\+json
+                     filters:
+                       - RewritePath=/books/(?<segment>.*),/v2/books/$\{segment}
+                   - id: rewrite_accept_v2
+                     uri: http://127.0.0.1:8081
+                     predicates:
+                       - Path=/isbns
+                       - Header=accept, application/vnd.api\.v2\+json
+                     filters:
+                       - RewritePath=/isbns,/v1/isbns
+                   # URI PATH VERSIONING
+                   - id: path_route
+                     uri: http://127.0.0.1:8083
+                     predicates:
+                       - Path=/v2/books
+                   - id: path_route
+                     uri: http://127.0.0.1:8083
+                     predicates:
+                       - Path=/v2/books/{segment}
+                   - id: path_route
+                     uri: http://127.0.0.1:8081
+                     predicates:
+                       - Path=/v2/isbns
+                     filters:
+                       - RewritePath=/v2/isbns,/v1/isbns
+
 ```
 </details>
 
@@ -254,12 +274,12 @@ To propose a cohesive and coherent API to our customer, we chose to publish all 
 Although [rest-number](../rest-number) only provides **ONE** version (i.e., the ``v1``), we expose both on the gateway and rewrite the URL as following:
 
 ```yaml
-  - id: path_route
-    uri: http://127.0.0.1:8081
-    predicates:
-      - Path=/v2/isbns
-    filters:
-      - RewritePath=/v2/isbns,/v1/isbns
+        - id: path_route
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/v2/isbns
+          filters:
+            - RewritePath=/v2/isbns,/v1/isbns
 ```
 
 ### Test it

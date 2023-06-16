@@ -24,8 +24,8 @@ import static org.springframework.http.HttpStatus.*;
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
 class MaintenanceControllerIT {
 
-    public static final String BOOKS_API_PREFIX = "/v1/books";
-    public static final String MAINTENANCE_API_PREFIX = "/v1/maintenance";
+    public static final String BOOKS_API_PREFIX = "/v2/books";
+    public static final String MAINTENANCE_API_PREFIX = "/v2/maintenance";
 
     @LocalServerPort
     private int port;
