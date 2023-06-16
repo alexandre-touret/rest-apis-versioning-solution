@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: /v1
+    context-path: /v2
 spring:
   datasource:
     url: jdbc:h2:mem:./test_db;DB_CLOSE_DELAY=-1;MODE=PostgreSQL

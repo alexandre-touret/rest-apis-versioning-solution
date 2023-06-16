@@ -1,9 +1,9 @@
 openapi: 3.0.0
 info:
   title: OpenAPI definition
-  version: v0
+  version: "v1"
 servers:
-  - url: http://localhost:8082
+  - url: http://localhost:8082/v1
 tags:
   - name: maintenance-controller
     description: Endpoint which enables maintenance
