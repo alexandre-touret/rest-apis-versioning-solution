@@ -6,6 +6,7 @@ import info.touret.bookstore.spring.book.BookConfiguration;
 import info.touret.bookstore.spring.book.dto.IsbnNumbers;
 import info.touret.bookstore.spring.book.entity.Book;
 import info.touret.bookstore.spring.book.exception.ApiCallTimeoutException;
+import info.touret.bookstore.spring.book.repository.AuthorRepository;
 import info.touret.bookstore.spring.book.repository.BookRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ public class BookService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BookService.class);
     private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
     private final RestTemplate restTemplate;
 
     private final CircuitBreakerFactory circuitBreakerFactory;
@@ -43,14 +45,15 @@ public class BookService {
     private final Integer findLimit;
 
     public BookService(BookRepository bookRepository,
+                       AuthorRepository authorRepository,
                        RestTemplate restTemplate,
                        @Value("${booknumbers.api.url}") String isbnServiceURL,
                        @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") CircuitBreakerFactory circuitBreakerFactory,
                        @Value("${book.find.limit:10}") Integer findLimit) {
         this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
         this.restTemplate = restTemplate;
         this.isbnServiceURL = isbnServiceURL;
-
         this.circuitBreakerFactory = circuitBreakerFactory;
         this.findLimit = findLimit;
     }
@@ -124,23 +127,32 @@ public class BookService {
         return bookRepository.findById(id);
     }
 
-    // To be invistgated
-    public Book updateBook(@Valid Book book) {
-        return bookRepository.save(book);
-    }
 
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
+    }
+
+    public Book updateBook(@Valid Book book) {
+        return bookRepository.save(updateBookGettingOrCreatingNewAuthors(book));
+    }
+
+    private Book updateBookGettingOrCreatingNewAuthors(Book book){
+        book.setAuthors(book.getAuthors().stream().map(author ->
+                authorRepository.findByPublicId(author.getPublicId()).orElseGet(() -> {
+                    author.setBooks(List.of(book));
+                    return author;
+                })
+        ).toList());
+        return book;
     }
 
     private Book persistBook(Book book) {
         var isbnNumbers = restTemplate.getForEntity(isbnServiceURL, IsbnNumbers.class).getBody();
         if (isbnNumbers != null) {
             book.setIsbn13(isbnNumbers.getIsbn13());
-            book.setIsbn10(isbnNumbers.getIsbn10());
+            book.setIsbn13(isbnNumbers.getIsbn10());
         }
-        return bookRepository.save(book);
+        return bookRepository.save(updateBookGettingOrCreatingNewAuthors(book));
     }
-
 
 }

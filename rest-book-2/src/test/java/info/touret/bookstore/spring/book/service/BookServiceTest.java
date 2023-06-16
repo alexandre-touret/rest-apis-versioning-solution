@@ -1,7 +1,9 @@
 package info.touret.bookstore.spring.book.service;
 
 import info.touret.bookstore.spring.book.dto.IsbnNumbers;
+import info.touret.bookstore.spring.book.entity.Author;
 import info.touret.bookstore.spring.book.entity.Book;
+import info.touret.bookstore.spring.book.repository.AuthorRepository;
 import info.touret.bookstore.spring.book.repository.BookRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,12 +42,13 @@ class BookServiceTest {
     @MockBean
     private CircuitBreakerFactory circuitBreakerFactory;
 
-
+    @MockBean
+    private AuthorRepository authorRepository;
     private ResponseEntity<IsbnNumbers> isbnNumbersResponseEntity;
 
     @BeforeEach
     void setUp() {
-        bookService = new BookService(bookRepository, restTemplate, "URL", circuitBreakerFactory,10);
+        bookService = new BookService(bookRepository, authorRepository, restTemplate, "URL", circuitBreakerFactory, 10);
     }
 
     @Test
@@ -63,7 +67,11 @@ class BookServiceTest {
         /* book & Isbn creation */
         var book = new Book();
         book.setId(1L);
-        book.setAuthor("author");
+        var author = new Author();
+        author.setFirstname("firstname");
+        author.setLastname("lastname");
+        author.setPublicId(UUID.randomUUID());
+        book.setAuthors(List.of(author));
         book.setDescription("description");
         book.setPrice(BigDecimal.TEN);
 
@@ -121,18 +129,26 @@ class BookServiceTest {
     void should_update_book() {
         Book book = new Book();
         book.setId(1L);
-        book.setAuthor("Harriet Beecher Stowe");
+        var author = new Author();
+        author.setFirstname("firstname");
+        author.setLastname("lastname");
+        author.setPublicId(UUID.randomUUID());
+        book.setAuthors(List.of(author));
         when(bookRepository.save(book)).thenReturn(book);
         var updateBook = bookService.updateBook(book);
         assertNotNull(updateBook);
-        assertEquals(book.getAuthor(), updateBook.getAuthor());
+        assertEquals(book.getAuthors(), updateBook.getAuthors());
     }
 
     @Test
     void should_delete_book() {
         Book book = new Book();
         book.setId(1L);
-        book.setAuthor("Harriet Beecher Stowe");
+        var author = new Author();
+        author.setFirstname("firstname");
+        author.setLastname("lastname");
+        author.setPublicId(UUID.randomUUID());
+        book.setAuthors(List.of(author));
 
         doNothing().when(bookRepository).deleteById(1L);
         bookService.deleteBook(1L);
@@ -143,8 +159,8 @@ class BookServiceTest {
         var book = Mockito.mock(Book.class);
         when(book.getId()).thenReturn(100L);
         when(book.getDescription()).thenReturn("""
-             Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-             """);
+                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+                """);
         when(book.getExcerpt()).thenReturn("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l");
         var longList = createBookList().stream().map(Book::getId).collect(Collectors.toList());
         when(bookRepository.findAllIds()).thenReturn(longList);
