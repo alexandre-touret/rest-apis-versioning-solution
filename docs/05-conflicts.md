@@ -428,7 +428,7 @@ For this workshop, we will do the translation in the [mappers](../rest-book/src/
 
 ### JPA entities
 
-Copy/paste [the entities modified in the v2](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/entity).
+Copy/paste [the entities modified in the v2](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/entity) in the [v1 module](../rest-book/src/main/java/info/touret/bookstore/spring/book/entity)
 
 ### Spring Data repository
 Nothing to do here.
@@ -472,18 +472,34 @@ public interface AuthorMapper {
 
 Yes [``Null`` sucks](https://en.wikipedia.org/wiki/Tony_Hoare) but it is the MapStruct _normal_ way .
 
-In the [``BookMapper`` class](../rest-book/src/main/java/info/touret/bookstore/spring/book/mapper/BookMapper.java), declare the [``AuthorMapper``](../rest-book/src/main/java/info/touret/bookstore/spring/book/mapper/AuthorMapper.java) as a dependency:
+In the [``BookMapper`` class](../rest-book/src/main/java/info/touret/bookstore/spring/book/mapper/BookMapper.java), declare the [``AuthorMapper``](../rest-book/src/main/java/info/touret/bookstore/spring/book/mapper/AuthorMapper.java) as a dependency and how to convert a list of authors to one and the other way around:
 
 ```java
+package info.touret.bookstore.spring.book.mapper;
+
+import info.touret.bookstore.spring.book.entity.Book;
+import info.touret.bookstore.spring.book.generated.dto.BookDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.List;
+
 @Mapper(uses = AuthorMapper.class)
 public interface BookMapper {
-    [...]
+    @Mapping(source = "author",target = "authors")
+    Book toBook(BookDto bookDto);
+
+    @Mapping(source = "authors",target = "author")
+    BookDto toBookDto(Book book);
+
+    List<BookDto> toBookDtos(List<Book> books);
 }
+
 ```
 
 ### Import Data
 
-Copy paste the [V2 ``import.sql``](../rest-book-2/src/main/resources/import.sql) content into [the V1](../rest-book/src/main/resources/import.sql).
+Copy paste the [v2 ``import.sql``](../rest-book-2/src/main/resources/import.sql) content into [the v1](../rest-book/src/main/resources/import.sql).
 
 ### Tests
 
@@ -492,7 +508,7 @@ We don't need them anymore.
 
 #### BookServiceTest
 
-Fix your test as earlier your ``author`` field declaration:
+Fix your test as earlier modifying your ``author`` field declaration:
 
 ```java
    var author = new Author();
@@ -502,6 +518,14 @@ Fix your test as earlier your ``author`` field declaration:
    book.setAuthors(List.of(author));
 ```
 
+Update then the ``should_update_book`` assertion: 
+
+
+```java
+        assertEquals(book.getAuthors().get(0), updateBook.getAuthors().get(0));
+
+```
+
 #### BookControllerIT
 
 Add an assertion in [the ``should_find_a_book()`` method](../rest-book/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java):
@@ -509,6 +533,8 @@ Add an assertion in [the ``should_find_a_book()`` method](../rest-book/src/test/
 ```java
 assertEquals("Harriet Beecher Stowe",bookDto.getAuthor());
 ```
+
+Copy then the test data from [rest-book-v2 module](../rest-book/src/main/resources/import.sql) to the [v1](../rest-book/src/main/resources/import.sql).
 
 ### Test it
 
@@ -533,7 +559,7 @@ http :8082/v1/books
 
 > **Note**
 >
-> We have seen in this chapter the potential issues of breaking changes.
+> We have seen in this chapter the breaking changes potential issues.
 > Adding new features creating new versions usually affect the previous ones.
 > That's why it is recommended to only propose **TWO** alive versions to your customers. The V1 is deprecated and the V2 is the target version.
 >

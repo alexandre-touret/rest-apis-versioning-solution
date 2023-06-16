@@ -137,6 +137,8 @@ class BookControllerIT {
         var bookDto = responseEntity.getBody();
         assertNotNull(bookDto);
         assertEquals(100L, bookDto.getId());
+        assertEquals("Harriet Beecher Stowe",bookDto.getAuthor());
+
     }
 
     @Test
