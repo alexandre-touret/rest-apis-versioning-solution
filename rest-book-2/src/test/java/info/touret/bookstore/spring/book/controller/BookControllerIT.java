@@ -3,6 +3,7 @@ package info.touret.bookstore.spring.book.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import info.touret.bookstore.spring.book.dto.IsbnNumbers;
+import info.touret.bookstore.spring.book.generated.dto.AuthorDto;
 import info.touret.bookstore.spring.book.generated.dto.BookDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -137,6 +138,7 @@ class BookControllerIT {
         var bookDto = responseEntity.getBody();
         assertNotNull(bookDto);
         assertEquals(100L, bookDto.getId());
+        assertEquals("7c11e1bf-1c74-4280-812b-cbc6038b7d21", bookDto.getAuthors().get(0).getPublicId());
     }
 
     @Test
@@ -150,7 +152,8 @@ class BookControllerIT {
     void should_register_a_book_successfully() throws Exception {
         createMockServerStandard();
         BookDto bookDto = new BookDto();
-        bookDto.setAuthor("George Orwell");
+        var authorDto = new AuthorDto().firstname("George").lastname("Orwell").publicId("6ce999fa-31bd-4a52-9692-22f55d2a1d2f");
+        bookDto.setAuthors(List.of(authorDto));
         bookDto.setTitle("Animal's farm");
         var responseEntity = testRestTemplate.postForEntity(booksUrl, bookDto, BookDto.class);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
@@ -164,7 +167,8 @@ class BookControllerIT {
     void should_throw_a_timeout_while_registering() throws Exception {
         createMockServerTimeout();
         var bookDto = new BookDto();
-        bookDto.setAuthor("George Orwell");
+        var authorDto = new AuthorDto().firstname("George").lastname("Orwell").publicId("6ce999fa-31bd-4a52-9692-22f55d2a1d2f");
+        bookDto.setAuthors(List.of(authorDto));
         bookDto.setTitle("Animal's farm");
         var responseEntity = testRestTemplate.postForEntity(booksUrl, bookDto, BookDto.class);
         assertEquals(HttpStatus.REQUEST_TIMEOUT, responseEntity.getStatusCode());
@@ -174,7 +178,8 @@ class BookControllerIT {
     void should_update_book() throws Exception {
         var book = new BookDto();
         book.setId(100L);
-        book.setAuthor("George Orwell");
+        var authorDto = new AuthorDto().firstname("George").lastname("Orwell").publicId("6ce999fa-31bd-4a52-9692-22f55d2a1d2f");
+        book.setAuthors(List.of(authorDto));
         book.setTitle("Animal's farm");
         var responseEntity = testRestTemplate.exchange(booksUrl, HttpMethod.PUT, new HttpEntity<>(book), BookDto.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());

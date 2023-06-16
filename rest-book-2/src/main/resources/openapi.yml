@@ -360,8 +360,10 @@ components:
           type: string
         isbn10:
           type: string
-        author:
-          type: string
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
         yearOfPublication:
           type: integer
           format: int32
@@ -394,3 +396,14 @@ components:
           format: date-time
         inMaintenance:
           type: boolean
+    Author:
+      type: object
+      properties:
+        lastname:
+          type: string
+        firstname:
+          type: string
+        publicId:
+          type: string
+
+
