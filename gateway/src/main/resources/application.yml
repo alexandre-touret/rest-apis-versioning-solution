@@ -127,25 +127,25 @@ spring:
 
 
 # SECURITY CONFIGURATION TO BE APPLIED (remove comments to apply it)
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          login-client:
-#            provider: authz
-#            client-id: gateway
-#            client-secret: secret3
-#            authorization-grant-type: client_credentials
-#            redirect-uri-template: "{baseUrl}/"
-#            scope: gateway
-#        provider:
-#          authz:
-#            authorization-uri: http://localhost:8009/oauth2/authorize
-#            token-uri: http://localhost:8009/oauth2/token
-#            user-info-uri: http://localhost:8009/oauth2/userinfo
-#            user-name-attribute: sub
-#            jwk-set-uri: http://localhost:8009/oauth2/token_keys
-#      resourceserver:
-#        jwt:
-#          jwk-set-uri: http://localhost:8009
+  security:
+    oauth2:
+      client:
+        registration:
+          login-client:
+            provider: authz
+            client-id: gateway
+            client-secret: secret3
+            authorization-grant-type: client_credentials
+            redirect-uri-template: "{baseUrl}/"
+            scope: gateway
+        provider:
+          authz:
+            authorization-uri: http://localhost:8009/oauth2/authorize
+            token-uri: http://localhost:8009/oauth2/token
+            user-info-uri: http://localhost:8009/oauth2/userinfo
+            user-name-attribute: sub
+            jwk-set-uri: http://localhost:8009/oauth2/token_keys
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8009
 
