@@ -1,14 +1,14 @@
 # Last but not least : what about security and authorization impacts?
 
 While versioning secured APIs, there is usually one impact we miss at the beginning: security, especially authorization.
-If you apply authorization policies on your whole platform using for instance, ABAC or RBAC mechanisms, you have to take care about your authorization.
+If you apply authorization policies on your whole platform using for instance, ABAC or RBAC mechanisms, you must take care about your authorization.
 They could indeed evolve over your versions.
 
-If you use [OAUTHv2](https://www.rfc-editor.org/rfc/rfc6749.html) or [OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html) (_what else?_), you could restrict the usage of a version to specific clients or end users using scopes stored in claims.
+If you use [OAUTHv2](https://www.rfc-editor.org/rfc/rfc6749.html) or [OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html) (_what else?_), you would restrict the usage of a version to specific clients or end users using scopes stored in claims.
 
 You can declare scopes stored in claims such as: ``bookv1:write`` or ``numberv2:read`` to specify both the authorised action and the corresponding version.
 
-We will see in this chapter how a standard [``credential flow`` authorization mechanism](https://www.rfc-editor.org/rfc/rfc6749#section-4.4) could handle versioning.
+We will see in this chapter how a standard [``credential flow`` authorization mechanism](https://www.rfc-editor.org/rfc/rfc6749#section-4.4) can handle versioning.
 
 > **Note**
 >
@@ -21,7 +21,7 @@ Before starting, please stop the [gateway](../gateway) and the [authorization se
 
 ### Authorization server:
 
-In the [``application.properties`` file](../authorization-server/src/main/resources/application.properties), verify that we have specified the action in every scope:
+In the [``application.properties`` file](../authorization-server/src/main/resources/application.properties), update the configuration with the good scopes:
 
 ```properties
 server.port=8009
@@ -96,8 +96,27 @@ You MUST have this error:
 
 If you want you can also verify the ``access_token`` and the claims on [jwt.io](https://jwt.io/) website.
 
-Finally, if you don't know how to create OIDC requests by your own, you can use https://oidcdebugger.com/.
+After copying/pasting the access token, you can see the following output with the corresponding roles:
 
+```json
+{
+  "sub": "customer2",
+  "aud": "customer2",
+  "nbf": 1687165633,
+  "scope": [
+    "bookv2:write",
+    "numberv2:read",
+    "openid",
+    "bookv2:read"
+  ],
+  "iss": "http://localhost:8009",
+  "exp": 1687165933,
+  "iat": 1687165633
+}
+```
+
+
+Finally, if you don't know how to create [OIDC requests](https://openid.net/developers/how-connect-works/) by your own, you can use https://oidcdebugger.com/.
 
 ### Declare routes and corresponding scopes in the gateway
 
