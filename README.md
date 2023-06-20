@@ -93,12 +93,12 @@ Here is a summary of the stack used in this workshop for this architecture:
 
 | Container | Tools                                                        | Comments |
 |---|--------------------------------------------------------------|---|
-| API Gateway | Spring Cloud Gateway 2022.0.0-RC2                                |  |
-| Bookstore API | JAVA 17,Spring Boot 3.0.X                                    |  |
-| ISBN API | JAVA 17,Spring Boot 3.0.X                                    |  |
-| Configuration Server | Spring Cloud Config 2022.0.0-RC2                                |  |
+| API Gateway | Spring Cloud Gateway 2022.0.3                                |  |
+| Bookstore API | JAVA 17,Spring Boot 3.1.X                                    |  |
+| ISBN API | JAVA 17,Spring Boot 3.1.X                                    |  |
+| Configuration Server | Spring Cloud Config 2022.0.3                                 |  |
 | Database | PostgreSQL                                                   |  |
-| Authorization Server | JAVA 17,Spring Boot 3.0.X, Spring Authorization Server 1.0.0 |  |
+| Authorization Server | JAVA 17,Spring Boot 3.1.X, Spring Authorization Server 1.1.0 |  |
 
 
 ### Customers
