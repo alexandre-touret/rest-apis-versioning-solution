@@ -198,8 +198,8 @@ You have then to run the command in the shell:
 
 ```jshelllanguage
 pip install httpie
-    sdk install java 17.0.5-tem
-    sdk default java 17.0.5-tem
+    sdk install java 17.0.7-tem
+    sdk default java 17.0.7-tem
 ```
 
 ## :boom: Ready ?
