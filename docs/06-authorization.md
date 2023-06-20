@@ -1,10 +1,10 @@
 # Last but not least : what about security and authorization impacts?
 
 While versioning secured APIs, there is usually one impact we miss at the beginning: security, especially authorization.
-If you apply authorization policies on your whole platform using for instance, ABAC or RBAC mechanisms, you must take care about your authorization.
+If you apply authorization policies on your whole platform using for instance, [ABAC](https://en.wikipedia.org/wiki/Attribute-based_access_control) or [RBAC](https://en.wikipedia.org/wiki/Role-based_access_control) approaches, you must take care about it.
 They could indeed evolve over your versions.
 
-If you use [OAUTHv2](https://www.rfc-editor.org/rfc/rfc6749.html) or [OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html) (_what else?_), you would restrict the usage of a version to specific clients or end users using scopes stored in claims.
+If you use [OAUTHv2](https://www.rfc-editor.org/rfc/rfc6749.html) or [OpenID Connect](https://openid.net/specs/openid-connect-core-1_0.html) (_what else?_), you would restrict the usage of a version to specific clients or end users using [scopes](https://auth0.com/docs/get-started/apis/scopes) stored in [claims](https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims).
 
 You can declare scopes stored in claims such as: ``bookv1:write`` or ``numberv2:read`` to specify both the authorised action and the corresponding version.
 
@@ -19,7 +19,7 @@ We will see in this chapter how a standard [``credential flow`` authorization me
 
 Before starting, please stop the [gateway](../gateway) and the [authorization server](../authorization-server).
 
-### Authorization server:
+### Authorization server
 
 In the [``application.properties`` file](../authorization-server/src/main/resources/application.properties), update the configuration with the good scopes:
 
