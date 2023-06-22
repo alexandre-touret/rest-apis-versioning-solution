@@ -188,7 +188,7 @@ You can use [Gitpod](https://gitpod.io).
 You must create an account first.
 You then can open this project in either your local VS Code or directly in your browser:
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/alexandre-touret/rest-apis-versioning-workshop.git)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/alexandre-touret/rest-apis-versioning-solution.git)
 
 ##### With Github Codespaces
 You can also [use Github Codespaces](https://docs.github.com/en/codespaces/).
