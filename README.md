@@ -211,7 +211,7 @@ pip install httpie
 You then can change the URL mentioned above to link GitHub and Gitpod:
 
 ```markdown
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/%%MY_NAMESPACE%%/rest-apis-versioning-workshop.git)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/%%MY_NAMESPACE%%/rest-apis-versioning-solution.git)
 ```
 
 or you can directly browse this URL (think to change the ``%%MY_NAMESPACE%%`` prefix):
