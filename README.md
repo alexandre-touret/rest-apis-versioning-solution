@@ -1,7 +1,10 @@
 
 # REST APIs Versioning: Hands-on !
 
-This workshop aims to introduce different ways to handle and propose several versions of a same API to your customers.
+This workshop aims to
+- Introduce REST API Versioning
+- Highlight API breaking and non breaking changes
+- Dive into all the impacts: configuration, code, security,...
 
 ## :dart: Big picture
 
@@ -93,12 +96,12 @@ Here is a summary of the stack used in this workshop for this architecture:
 
 | Container | Tools                                                        | Comments |
 |---|--------------------------------------------------------------|---|
-| API Gateway | Spring Cloud Gateway 2022.0.3                                |  |
-| Bookstore API | JAVA 17,Spring Boot 3.1.X                                    |  |
-| ISBN API | JAVA 17,Spring Boot 3.1.X                                    |  |
-| Configuration Server | Spring Cloud Config 2022.0.3                                 |  |
+| API Gateway | Spring Cloud Gateway 2023.0.0                                |  |
+| Bookstore API | JAVA 21,Spring Boot 3.2.X                                    |  |
+| ISBN API | JAVA 21,Spring Boot 3.2.X                                    |  |
+| Configuration Server | Spring Cloud Config 2023.0.0                                 |  |
 | Database | PostgreSQL                                                   |  |
-| Authorization Server | JAVA 17,Spring Boot 3.1.X, Spring Authorization Server 1.1.0 |  |
+| Authorization Server | JAVA 21,Spring Boot 3.2.X, Spring Authorization Server 1.1.0 |  |
 
 
 ### Customers
@@ -143,8 +146,8 @@ gitGraph:
 ### :wrench: Tools
 #### If you want to execute this workshop locally
 You **MUST** have set up these tools first:
-* [Java 17+](https://adoptium.net/temurin/releases/?version=17)
-* [Gradle 7.5+](https://gradle.org/)
+* [Java 21+](https://adoptium.net/temurin/releases/?version=21)
+* [Gradle 8.5+](https://gradle.org/)
 * [Docker](https://docs.docker.com/) & [Docker compose](https://docs.docker.com/compose/)
 * Any IDE ([IntelliJ IDEA](https://www.jetbrains.com/idea), [VSCode](https://code.visualstudio.com/), [Netbeans](https://netbeans.apache.org/),...) you want
 * [cURL](https://curl.se/), [jq](https://stedolan.github.io/jq/), [HTTPie](https://httpie.io/) or any tool to call your REST APIs
@@ -156,10 +159,9 @@ Here are commands to validate your environment:
 
 ```jshelllanguage
 java -version
-    openjdk version "17.0.5" 2022-10-18
-    OpenJDK Runtime Environment Temurin-17.0.5+8 (build 17.0.5+8)
-    OpenJDK 64-Bit Server VM Temurin-17.0.5+8 (build 17.0.5+8, mixed mode, sharing)
-
+openjdk version "21.0.1" 2023-10-17 LTS
+OpenJDK Runtime Environment Temurin-21.0.1+12 (build 21.0.1+12-LTS)
+OpenJDK 64-Bit Server VM Temurin-21.0.1+12 (build 21.0.1+12-LTS, mixed mode, sharing)
 ```
 
 **Gradle**
@@ -167,19 +169,29 @@ java -version
 If you use the wrapper, you won't have troubles. Otherwise...:
 
 ```jshelllanguage
-gradle --version
+gradle -version
 
-    Welcome to Gradle 7.6!
+------------------------------------------------------------
+Gradle 8.5
+------------------------------------------------------------
+
+Build time:   2023-11-29 14:08:57 UTC
+Revision:     28aca86a7180baa17117e0e5ba01d8ea9feca598
+
+Kotlin:       1.9.20
+Groovy:       3.0.17
+Ant:          Apache Ant(TM) version 1.10.13 compiled on January 4 2023
+JVM:          21.0.1 (Eclipse Adoptium 21.0.1+12-LTS)
+OS:           Linux 5.15.133.1-microsoft-standard-WSL2 amd64
 ```
 
 **Docker Compose**
 
 ```jshelllanguage
 docker compose version
-    Docker Compose version v2.12.2
+    
+Docker Compose version v2.22.2
 ```
-
-
 
 #### :rocket: If you don't want to bother with a local setup
 
@@ -198,28 +210,22 @@ You have then to run the command in the shell:
 
 ```jshelllanguage
 pip install httpie
-    sdk install java 17.0.7-tem
-    sdk default java 17.0.7-tem
+sdk install java 21.0.1-tem
+sdk default java 21.0.1-tem
 ```
 
 ## :boom: Ready ?
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/alexandre-touret/rest-apis-versioning-solution.git)
 
-> **Warning**
+> **If you fork this repo**
 >
-> I **strongly** suggest to fork this project into your personal GitHub namespace (aka your GitHub account).
-
-You then can change the URL mentioned above to link GitHub and Gitpod:
-
-```markdown
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/%%MY_NAMESPACE%%/rest-apis-versioning-solution.git)
-```
-
+> Don't forget to change the "Open in GitPod" button URL:
+> ```markdown
+> [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#github.com/%%MY_NAMESPACE%%/rest-apis-versioning-workshop.git)
+> ```
 or you can directly browse this URL (think to change the ``%%MY_NAMESPACE%%`` prefix):
 
-``https://gitpod.io/#github.com/%%MY_NAMESPACE%%/rest-apis-versioning-solution.git``
+> ``https://gitpod.io/#github.com/%%MY_NAMESPACE%%/rest-apis-versioning-workshop.git``
+_________________
 
-
-> **Note**
->
-> Now, you can start [the workshop](./docs/index.md) :tada:.
-  
+**Now, you can start [the workshop](docs/index.md) :tada:.**
