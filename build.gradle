@@ -15,17 +15,12 @@ allprojects {
     apply plugin: 'idea'
     group = 'info.touret.bookstore.spring'
     version = '0.0.1-SNAPSHOT'
-    sourceCompatibility = '17'
+    sourceCompatibility = '21'
 
     repositories {
         maven { url 'https://repo.spring.io/milestone' }
         mavenCentral()
     }
-
-    test {
-        useJUnitPlatform()
-    }
-
 }
 
 subprojects {
