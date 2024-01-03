@@ -76,9 +76,6 @@ http http://localhost:8888/rest-number/default
 
 You should have such an output:
 
-<details>
-<summary>Click to expand</summary>
-
 ```json
 HTTP/1.1 200
 Connection: keep-alive
@@ -135,7 +132,6 @@ Transfer-Encoding: chunked
 }
 
 ```
-</details>
 
 
 :warning: In the same way, you **MUST** also start the [authorization-server](../authorization-server).
