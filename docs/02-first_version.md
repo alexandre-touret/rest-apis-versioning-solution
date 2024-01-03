@@ -1,10 +1,20 @@
 # Your first version
 
+## TL;DR: What will you learn in this chapter?
+
+This chapter covers the following topics:
+
+1. Pinpoint the impacts of the versioning in the OPENAPI Description file
+2. Implement a URL Based versioning
+3. Implement a header based versioning
+4. Deploy and configure a default version for your API
+
+## Prerequisites
 We will define in this chapter our first version in the URI and in a header mixing in the gateway & the apps.
 
 > **Warning**
 >
-> Before starting, this chapter, please shut down all the spring apps already started:
+> Before starting this chapter, please shut down all the apps already started:
 > * [config server](../config-server)
 > * [gateway](../gateway)
 > * [authorization server](../authorization-server)
@@ -13,7 +23,7 @@ We will define in this chapter our first version in the URI and in a header mixi
 
 ## URI based version
 
-In the current rest-book version,we have already defined define the version in the BookController's URI.
+In the current rest-book version,we have already defined the version in the BookController's URI.
 
 The pattern is ``/api/%VERSION%/books``.
 For instance, we could have ``/api/v1/books``.
@@ -95,38 +105,32 @@ Now, build the project:
 ``` 
 
 ### In the gateway
-
-Check the routes already defined in
-the [gateway application.yml configuration file](../gateway/src/main/resources/application.yml).
-
-<details>
-<summary>Click to expand</summary>
+Check the routes already defined in the [gateway application.yml configuration file](../gateway/src/main/resources/application.yml).
 
 ```yaml
 spring:
- application:
-  name: gateway
- zipkin:
-  base-url: http://localhost:9411
-  sender:
-   type: web
- cloud:
-  gateway:
-   routes:
-    - id: path_route
-      uri: http://127.0.0.1:8082
-      predicates:
-       - Path=/v1/books
-    - id: path_route
-      uri: http://127.0.0.1:8082
-      predicates:
-       - Path=/v1/books/{segment}
-    - id: path_route
-      uri: http://127.0.0.1:8081
-      predicates:
-       - Path=/v1/isbns
+  application:
+    name: gateway
+  zipkin:
+    base-url: http://localhost:9411
+    sender:
+      type: web
+  cloud:
+    gateway:
+      routes:
+        - id: path_route
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/v1/books
+        - id: path_route
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/v1/books/{segment}
+        - id: path_route
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/v1/isbns
 ```
-</details>
 
 ### Tests
 
@@ -134,20 +138,15 @@ spring:
 
 Normally, you Docker infrastructure should be up. If not, start it:
 
-<details>
-<summary>Click to expand</summary>
 
 ```jshelllanguage
-cd infrastructure 
+cd infrastructure
 docker compose up
 ```
-</details>
 
 
 Start then the different applications:
 
-<details>
-<summary>Click to expand</summary>
 In the first shell:
 
 ```jshelllanguage
@@ -176,9 +175,6 @@ Last but not least, in the last one:
  ./gradlew bootRun -p gateway
 ```
 
-</details>
-
-
 You can now reach the API.
 
 For instance, you can reach the gateway:
@@ -193,8 +189,6 @@ You can also access directly to the rest-book backend:
 http :8082/v1/books/count
 ```
 
-Now you can update in the same way [your scripts](../bin) adding the version prefix.
-
 By the way, you can also verify if the Swagger and OpenAPI is up-to-date by browsing these endpoints:
 
 * http://localhost:8082/v1/swagger-ui/index.html
@@ -203,13 +197,13 @@ By the way, you can also verify if the Swagger and OpenAPI is up-to-date by brow
 ### Create a HTTP Header based version
 
 In this chapter, we will put in place a rewrite/redirection mechanism in the gateway to route incoming requests
-regarding an header.
+regarding a header.
 
 For this workshop we will extract the ``X-API-VERSION`` HTTP header and route to the appropriate backend.
-For instance if we reach the API as following:
+For instance if we reach the API as following :
 
 ```jshelllanguage
-http :8080/books/count "X-API-VERSION: v1" 
+http :8080/... "X-API-VERSION: v1" 
 ```
 Our gateway will rewrite the URL and reach the good version (i.e., the version specified by the header).
 
@@ -229,31 +223,31 @@ We will illustrate this behaviour by adding another route in the [gateway's conf
 Here is an example:
 
 ```yaml
-[ ... ]
-cloud:
-  gateway:
-    routes:
-      - id: rewrite_v1
-        uri: http://127.0.0.1:8082
-        predicates:
-          - Path=/books/{segment}
-          - Header=X-API-VERSION, v1
-        filters:
-          - RewritePath=/books/(?<segment>.*),/v1/books/$\{segment}
-      - id: rewrite_v1
-        uri: http://127.0.0.1:8082
-        predicates:
-          - Path=/books
-          - Header=X-API-VERSION, v1
-        filters:
-          - RewritePath=/books,/v1/books
-      - id: rewrite_v1
-        uri: http://127.0.0.1:8081
-        predicates:
-          - Path=/isbns
-          - Header=X-API-VERSION, v1
-        filters:
-          - RewritePath=/isbns,/v1/isbns
+  cloud:
+    gateway:
+      routes:
+        [ ... ]
+        - id: rewrite_v1
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/books/{segment}
+            - Header=X-API-VERSION, v1
+          filters:
+            - RewritePath=/books/(?<segment>.*),/v1/books/$\{segment}
+        - id: rewrite_v1
+          uri: http://127.0.0.1:8082
+          predicates:
+            - Path=/books
+            - Header=X-API-VERSION, v1
+          filters:
+            - RewritePath=/books,/v1/books
+        - id: rewrite_v1
+          uri: http://127.0.0.1:8081
+          predicates:
+            - Path=/isbns
+            - Header=X-API-VERSION, v1
+          filters:
+            - RewritePath=/isbns,/v1/isbns
 ```
 
 Restart the gateway:
@@ -274,8 +268,7 @@ You can now test your API using this new way:
 http :8080/books/count "X-API-VERSION: v1" 
 ```
 
-You can use now some dedicated scripts for this new approach. For instance, the [``randomBook``](../bin/randomBook.sh)
-script can be modified.
+You can use now some dedicated scripts for this new approach:
 
 * ``bin/countBooks-header.sh``
 * ``bin/createBook-header.sh``
@@ -287,52 +280,37 @@ script can be modified.
 
 Now you can test your API using either these two ways.
 
-### Create an ``accept`` media type header based version
+### Create a default version
+Now let's deep dive into the gateway configuration.
+We will configure it to apply automatically a version if no one is applied.
 
-It is also possible to specify the version in the [``accept`` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept).
-For example, you can define the new one defined in the last two paragraphs as following:
+Stop the gateway by typing CTRL+C.
 
-```cookie
-Accept: application/vnd.api.v1+json
-```
+Add the following route at **THE END** of the routes definition:
 
-We won't deep dive into this mechanism because its implementation is mostly the same as the last one.
-
-For your information, you can define these new routes in [the gateway](../gateway/src/main/resources/application.yml).
 
 ```yaml
-   # HTTP ACCEPT MEDIA TYPE HEADER VERSIONING
-   - id: rewrite_accept_v1
-     uri: http://127.0.0.1:8082
-     predicates:
-       - Path=/books
-       - Header=accept, application/vnd.api\.v1\+json
-     filters:
-       - RewritePath=/books,/v1/books
-   - id: rewrite_accept_v1
-     uri: http://127.0.0.1:8082
-     predicates:
-       - Path=/books/{segment}
-       - Header=accept, application/vnd.api\.v1\+json
-     filters:
-       - RewritePath=/books/(?<segment>.*),/v1/books/$\{segment}
-   - id: rewrite_accept_v1
-     uri: http://127.0.0.1:8081
-     predicates:
-       - Path=/isbns
-       - Header=accept, application/vnd.api\.v1\+json
-     filters:
-       - RewritePath=/isbns,/v1/isbns
+  - id: default_version_v1
+    uri: http://127.0.0.1:8081
+    predicates:
+    - Path=/isbns
+    filters:
+    - RewritePath=/isbns,/v1/isbns
 ```
 
-Restart the gateway (see above to know how).
-
-You can now test them by specifying
-the [``accept`` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept):
+Restart the gateway
 
 ```jshelllanguage
-http :8080/isbns "accept:application/vnd.api.v1+json" 
+ ./gradlew bootRun -p gateway
 ```
+
+and run the following command:
+
+```jshelllanguage
+http :8080/isbns
+```
+
+The default version is automatically applied and the gateway should throw the request to the isbns v1 API endpoint.
 
 ## Conclusion
 
