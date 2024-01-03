@@ -2,14 +2,17 @@
 
 At this point we have our first customer : **John Doe** who uses our API with the current specification.
 
+## TL;DR: What will you learn in this chapter?
+
+This chapter covers the following topics:
+
+1. How to start the platform
+2. Adding a non-breaking change and see how it doesn't impact the API Contract 
+
 ## Prerequisites
 
-You have to start three new shells and run [rest-book](../rest-book), [rest-number](../rest-number), [authorization-server](../authorization-server)
-and [the gateway](../gateway) modules.
+You must start three new shells and run [rest-book](../rest-book), [rest-number](../rest-number) and [the gateway](../gateway) modules.
 As mentioned earlier, you must be at the root of the project (i.e., ``rest-apis-versioning-workshop``).
-
-<details>
-<summary>Click to expand</summary>
 
 In the first shell, run:
 
@@ -32,7 +35,6 @@ And in the last one:
 
 _You can disable unit and integration tests by adding the option ``-x test`` at the end of the command ;-)._
 
-</details>
 
 ## The current status
 
@@ -54,7 +56,7 @@ http :8081/v1/v3/api-docs
 You can also check the documentation by browsing these endpoints:
 
 * http://localhost:8082/v1/swagger-ui/index.html
-* http://localhost:8081/v1swagger-ui/index.html
+* http://localhost:8081/v1/swagger-ui/index.html
 
 You can also use the scripts located in the [bin](../bin) folder.
 
@@ -82,7 +84,8 @@ In this chapter, we will update the [Book schema in the OpenAPI spec file](../re
 This attribute is (only for the workshop) the beginning of the [description attribute](../rest-book/src/main/resources/openapi.yml).
 We will extract the first 100 characters.
 
-1. Update the [OpenAPI spec file](../rest-book/src/main/resources/openapi.yml), add the ``excerpt`` attribute
+1. Update the [OpenAPI spec file](../rest-book/src/main/resources/openapi.yml)
+   of [the rest-book module]((../rest-book/src/main/resources/openapi.yml)) , add the ``excerpt`` attribute:
 
 ```yaml
     Book:
@@ -107,13 +110,14 @@ The build and tests should success. In the meantime, you would get this warning 
    BookDto toBookDto(Book book);
 
 ```
-It is *"normal"* because the POJO used to persist data has not been modified yet.
+
+It is *"normal"* because the POJO (*Plain Old Java Object*) used to persist data has not been modified yet.
 
 3. Normally you can see now this new attribute in
    the [BookDto class](../rest-book/build/generated/src/main/java/info/touret/bookstore/spring/book/generated/dto/BookDto.java)
    .
 4. In the [Book entity class](../rest-book/src/main/java/info/touret/bookstore/spring/book/entity/Book.java), add a
-   transient attribute as below
+   transient attribute as below by uncommenting the following code.
 
 ```java
 
@@ -145,53 +149,8 @@ Before creating unit and integration tests, we can run them to see if this modif
 
 :question: See what happens: Is it blocking or not?
 
-5. You can add a test in the [BookServiceTest](../rest-book/src/test/java/info/touret/bookstore/spring/book/service/BookServiceTest.java)
-<details>
-<summary>Click to expand</summary>
 
-For instance:
-
-
-```java
-@Test
- void should_find_a_random_book_with_excerpt() {
-         var book = Mockito.mock(Book.class);
-        when(book.getId()).thenReturn(100L);
-        when(book.getDescription()).thenReturn("""
-             Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-             """);
-        when(book.getExcerpt()).thenReturn("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l");
-        var longList = createBookList().stream().map(Book::getId).collect(Collectors.toList());
-        when(bookRepository.findAllIds()).thenReturn(longList);
-        when(bookRepository.findById(anyLong())).thenReturn(Optional.of(book));
-        assertNotNull(bookService.findRandomBook());
-        var bookFounded = bookService.findRandomBook();
-        assertEquals(book.getDescription().substring(0, 100), bookFounded.getExcerpt());
-        }
-```
-</details>
-
-You can also add a similar test in the [BookControllerIT](../rest-book/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java) integration test.
-
-For instance, you can add this assertion in the [``should_get_a_random_book`` method](../rest-book/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java):
-
-```java
-@Test
-void should_get_a_random_book() {
-        var bookDto = testRestTemplate.getForEntity(booksUrl + "/random", BookDto.class).getBody();
-        assertNotNull(bookDto.getId());
-        assertEquals(bookDto.getDescription().substring(0,100),bookDto.getExcerpt());
-        }
-
-```
-
-Now you can re-build your application and validate it by running tests.
-
-```jshelllanguage
-./gradlew clean build -p rest-book
-```
-
-6. Now, let's get a random book with an excerpt
+5. Now, let's get a random book with an excerpt
 
 Restart your rest-book service
 
@@ -202,21 +161,19 @@ Restart your rest-book service
 Check it manually by running the following command:
 
 ```jshelllanguage
-http :8082/v1/books/1098 --print b|jq.excerpt 
+http :8082/v1/books/1098 --print b | jq .excerpt 
 ```
 
 You can also do that through the API Gateway:
 
 ```jshelllanguage
-http :8080/v1/books/1098 --print b|jq.excerpt 
+http :8080/v1/books/1098 --print b | jq .excerpt 
 ```
 ## Adding a new operation
 
 You can then add a new operation ``getBookExcerpt``.
 
 In the [OpenAPI spec file](../rest-book/src/main/resources/openapi.yml), add a new operation:
-<details>
-<summary>Click to expand</summary>
 
 For instance:
 
@@ -261,7 +218,7 @@ For instance:
                        "$ref": "#/components/schemas/APIError"
 
 ```
-</details>
+
 
 You can now generate the corresponding Java code.
 
@@ -269,24 +226,9 @@ You can now generate the corresponding Java code.
 ./gradlew  openApiGenerate -p rest-book
 ```
 
-Now, you can add a new integration test assertion:
-
-In the [BookControllerIT](../rest-book/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java) class, add the following method:
-
-```java
-@Test
-void should_find_an_excerpt() throws Exception {
-        var responseEntity = testRestTemplate.getForEntity(booksUrl + "/100/excerpt", String.class);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        var excerpt = responseEntity.getBody();
-        assertNotNull(excerpt);
-        assertEquals("Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut l", excerpt);
-}
-```
-
 Now, let us create the corresponding method in [BookController](../rest-book/src/main/java/info/touret/bookstore/spring/book/controller/BookController.java):
 
-Add the following method:
+Uncomment the following method:
 
 ```java
    @Override
@@ -300,10 +242,10 @@ public ResponseEntity<String> getBookExcerpt(Long id) {
 }
 ```
 
-Run tests again:
+Build it again:
 
 ```jshelllanguage
-./gradle build
+./gradlew build -p rest-book 
 ```
 
 You have now added new data and functionality to your API without any version :exclamation:
@@ -316,7 +258,8 @@ integration test.
 It uses
 the [good old BookDto definition](../rest-book/src/test/java/info/touret/bookstore/spring/book/generated/dto/BookDto.java)
 which represents the previous definition
-of [BookDto](../rest-book/build/generated/src/main/java/info/touret/bookstore/spring/book/generated/dto/BookDto.java).
+of [BookDto](../rest-book/build/generated/src/main/java/info/touret/bookstore/spring/book/generated/dto/BookDto.java) (
+i.e., without the ``excerpt`` functionality.
 This class is based on the
 first [BookDto definition](../rest-book/build/generated/src/main/java/info/touret/bookstore/spring/book/generated/dto/BookDto.java) (
 i.e., without the ``exceprt`` attribute).
@@ -324,15 +267,14 @@ i.e., without the ``exceprt`` attribute).
 Run it, check the log output provided by [LogBook](https://github.com/zalando/logbook/).
 
 ```jshelllanguage
-./gradlew -p rest-book test --tests "Old*IT"
+./gradlew -p rest-book test
 ```
 Check the [test log file](../rest-book/build/test-results/test/TEST-info.touret.bookstore.spring.book.controller.OldBookControllerIT.xml) and search the HTTP logs
 
 For instance:
 
-<details>
-<summary>Click to expand</summary>
-2023-06-09T17:19:49.723+02:00 TRACE 420048 --- [-auto-1-exec-10] org.zalando.logbook.Logbook              : {
+```json
+ {
   "origin" : "local",
   "type" : "response",
   "correlation" : "acc9e76fa90e42ed",
@@ -363,7 +305,7 @@ For instance:
 }
 }
 
-</details>
+```
 
 > **Note**
 >

@@ -1,11 +1,21 @@
 # And now something completely different : a second version
 
+## TL;DR: What are you going to learn in this chapter?
+
+This chapter covers the following topics:
+
+1. Creating a new version (it will be a copy of the rest-book module)
+2. Add a new breaking change functionality to the last version
+
 ## A new functionality for a new customer
 
-We have now a new customer. Good news/bad news!
-The good one is our API tends to be famous, the bad one is we need to change our API contract without impacting our
-existing customers.
-The very bad point, is our existing customers cannot update their API clients before one year (at least).
+We have now a new customer. 
+
+Good news/bad news!
+
+The good one is our API is now famous, the bad one is we must change our API contract without impacting our existing customers.
+
+The very bad point, is our existing customers cannot update their API clients by one year (at least).
 We then decided to create a new version!
 
 In this case, it is strongly recommended to deal with GIT long time versions.
@@ -25,12 +35,7 @@ You **MUST** stop the running [rest-book module](../rest-book) before!
 
 ### Duplicating the rest-book module
 
-* Copy/paste the [rest-book module](../rest-book)
-* Rename the new folder as ``rest-book-2``
-* Update the [build.gradle] with the configuration below:
-
-<details>
-<summary>Click to expand</summary>
+* Update the [build.gradle](../build.gradle) file uncommenting the following configuration:
 
 ```groovy
 project(':rest-book-2') {
@@ -89,9 +94,8 @@ project(':rest-book-2') {
 
 ```
 
-</details>
-
-In the [settings.gradle](../settings.gradle) file you have to define this new module:
+In the [settings.gradle](../settings.gradle) file you have to define this new module.
+Uncomment this line:
 
 ```properties
 include 'rest-book-2'
@@ -103,36 +107,16 @@ Validate your configuration by building this project:
 ./gradlew build -p rest-book-2
 ```
 
-You will then have to re-import the new configuration in your IDE by refreshing it.
-
-You can also only build the new module by running this command :
+You will then have to re-import the new configuration in your IDE by refreshing it (You can also only build the new module by running this command):
 
 ```jshelllanguage
 ./gradlew build -p rest-book-2
 ```
 
-You MAY also update your CI by adding a new job on [your Github workflow](../.github/workflows/build.yml):
+## Adding a new functionality to rest-book2
 
-```yaml
-  build-book-2:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-      - name: Build with Gradle
-        run: ./gradlew -p rest-book-2 clean build
-```
-
-
-## Adding a new functionality
-
-In this new service, we are to deploy new features for our new customer. He/She has a huge library of books, we therefore want to
-limit the numbers of results provided by our [``/books`` API](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/controller/BookController.java) to only 10 results.
+In this new service, we are to deploy new features for our new customer. 
+He/She has a huge library of books, we therefore want to limit the numbers of results provided by our [``/books`` API](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/controller/BookController.java) to only 10 results.
 
 We could imagine that a search engine functionality would be more realistic.
 However, for this workshop, we will only work to a books list limiter.
@@ -141,25 +125,32 @@ This limit will be applied by creating a new query which uses a [``Pageable`` pa
 
 This object is really useful to paginate results. We will only use it for limiting the data queried on the database and returned by our API.
 
-In the [``BookRepository`` class](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/repository/BookRepository.java), add the following method:
+In the rest-book-2 [``BookRepository`` class](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/repository/BookRepository.java),
+add the following method:
 
 ```java
 List<Book> findAll(Pageable pageable);
 ```
 
-Beware of the import of the ``Pageable`` class. 
-It should be:
+Add also these import declarations:
 
 ```java
 import org.springframework.data.domain.Pageable;
+import java.util.List;
 ```
 
 In the [BookService](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/service/BookService.java) class, update the [``findAllBooks`` method](../rest-book-2/src/main/java/info/touret/bookstore/spring/book/service/BookService.java):
 
 ```java
-public List<Book> findAllBooks() {
-    return bookRepository.findAll(PageRequest.of(0, findLimit));
+public List<Book> findAllBooks(){
+        return bookRepository.findAll(PageRequest.of(0,findLimit));
 }
+```
+
+Add also the corresponding import declaration:
+
+```java
+import org.springframework.data.domain.PageRequest;
 ```
 
 The field ``findLimit`` is set in the constructor:
@@ -167,18 +158,18 @@ The field ``findLimit`` is set in the constructor:
 ```java
     private final Integer findLimit;
 
-    public BookService(BookRepository bookRepository,
-                       RestTemplate restTemplate,
-                       @Value("${booknumbers.api.url}") String isbnServiceURL,
-                       @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") CircuitBreakerFactory circuitBreakerFactory,
-                       @Value("${book.find.limit:10}") Integer findLimit) {
-        this.bookRepository = bookRepository;
-        this.restTemplate = restTemplate;
-        this.isbnServiceURL = isbnServiceURL;
+public BookService(BookRepository bookRepository,
+        RestTemplate restTemplate,
+@Value("${booknumbers.api.url}") String isbnServiceURL,
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") CircuitBreakerFactory circuitBreakerFactory,
+@Value("${book.find.limit:10}") Integer findLimit){
+        this.bookRepository=bookRepository;
+        this.restTemplate=restTemplate;
+        this.isbnServiceURL=isbnServiceURL;
 
-        this.circuitBreakerFactory = circuitBreakerFactory;
-        this.findLimit = findLimit;
-    }
+        this.circuitBreakerFactory=circuitBreakerFactory;
+        this.findLimit=findLimit;
+        }
 
 
 ```
@@ -189,44 +180,6 @@ You have then to add some config lines and the [rest-book.yml](../config-server/
 book:
   find:
     limit: 10
-```
-
-### Tests
-
-Now, we have to update our unit tests.
-In the [``BookServiceTest``](../rest-book-2/src/test/java/info/touret/bookstore/spring/book/service/BookServiceTest.java), update the ``setUp`` method:
-
-```java
-@BeforeEach
-    void setUp() {
-        bookService = new BookService(bookRepository, restTemplate, "URL", circuitBreakerFactory,10);
-    }
-```
-and the [Mockito](https://site.mockito.org/) configuration of ``should_find_all_books()`` method:
-
-```java
-@Test
-void should_find_all_books() {
-    List<Book> books = createBookList();
-    when(bookRepository.findAll(any(Pageable.class))).thenReturn(books);
-[...]
-```
-
-The integration tests [BookControllerIT](../rest-book-2/src/test/java/info/touret/bookstore/spring/book/controller/BookControllerIT.java) and [OldBookControllerIT](../rest-book-2/src/test/java/info/touret/bookstore/spring/book/controller/OldBookControllerIT.java) are not really representative of the new behaviour anymore because they only return one element.
-If you have time enough, you MAY update the [``books-data.sql``](../rest-book-2/src/test/resources/books-data.sql) file to have more elements and test the limit.
-
-Finally, add the same config value you added earlier in [your test configuration file](../rest-book-2/src/test/resources/application.yml)
-
-```yaml
-book:
-  find:
-    limit: 10
-```
-
-Build and test your application:
-
-```jshelllanguage
-./gradlew clean build -p rest-book-2
 ```
 
 ## Running it
